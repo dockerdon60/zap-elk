@@ -29,5 +29,20 @@ RUN	wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add 
 RUN	echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-5.x.list  && \
 	apt-get -y update  && \
 	apt-get install -y elasticsearch kibana logstash
+##	Configure elasticsearch:
+COPY	config/elasticsearch.yml /etc/elasticsearch/
+COPY	config/jvm.options /etc/elasticsearch/
+COPY	config/elasticsearch /etc/default/
+COPY	config/elasticsearch.service /usr/lib/systemd/system/
+
+##	Configure kibana:
+COPY	config/kibana.yml /etc/kibana/
+COPY	config/kibana.service /etc/systemd/system/
+##	Add the start_services script:
+COPY	start_services.sh /root/
+RUN	chown root:root /root/start_services.sh && \
+	chmod 777 /root/start_services.sh && \
+	chmod u+s /root/start_services.sh
+
 #USER	zap
 #WORKDIR	/zap
